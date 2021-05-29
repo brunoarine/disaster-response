@@ -1,8 +1,22 @@
 import sys
-
+import pandas as pd
 
 def load_data(database_filepath):
-    pass
+    """Loads the database in SQL format and returns machine-learning ready X,
+    Y, and category_names
+    """
+
+    engine = create_engine(f'sqlite:///{database_filepath}')
+    df = pd.read_sql("messages", con=engine)
+
+    # drop `id` and `original` columns since they have no effect on prediction
+    df = df.drop(["id", "original"], axis=1)
+
+    X = df[["message", "genre"]]
+    Y = df.drop(["message", "genre"], axis=1)
+    category_names = X.columns
+
+    return X, Y, category_names
 
 
 def tokenize(text):
