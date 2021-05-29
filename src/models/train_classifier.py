@@ -114,7 +114,7 @@ def evaluate_model(model, X_test, Y_test, category_names):
 
     print("Mean PR AUC:", np.mean(pr_scores))
     print("Mean ROC AUC:", np.mean(roc_scores))
-    print(pd.DataFrame(np.array([Y_test.columns, scores]).T, columns=["Category", "PR AUC", "ROC AUC"]))
+    print(pd.DataFrame(np.array([Y_test.columns, pr_scores, roc_scores]).T, columns=["Category", "PR AUC", "ROC AUC"]))
 
 
 def save_model(model, model_filepath):
@@ -153,7 +153,7 @@ def main():
         print('Please provide the filepath of the disaster messages database '\
               'as the first argument and the filepath of the pickle file to '\
               'save the model to as the second argument. \n\nExample: python '\
-              'train_classifier.py ../data/DisasterResponse.db classifier.pkl')
+              'train_classifier.py ../data/processed/DisasterResponse.db ../models/classifier.joblib')
 
 
 if __name__ == '__main__':
