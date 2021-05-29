@@ -20,7 +20,24 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-    pass
+    """Tokenizes texts by first stripping punctuations and normalizing cases.
+    Words are also preprocessed with Porter Stemmer before tokenization takes place.
+    """
+    # normalize case and remove punctuation
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
+    
+    # tokenize text
+    tokens = regexp_tokenize(text, pattern="\w+")
+    
+    tokens = [word for word in tokens if word not in STOPWORDS]
+    stemmer = PorterStemmer()
+
+    clean_tokens = []
+    for tok in tokens:
+        clean_tok = stemmer.stem(tok)
+        clean_tokens.append(clean_tok)
+
+    return clean_tokens
 
 
 def build_model():
