@@ -130,6 +130,7 @@ def main():
 
         # load nltk's stopwords into a global variable instead of
         # calling the function repeatedly
+        global STOPWORDS
         STOPWORDS = stopwords.words("english")
 
         database_filepath, model_filepath = sys.argv[1:]
