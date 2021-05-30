@@ -35,9 +35,8 @@ def load_data(database_filepath):
 
     X = df[["message", "genre"]]
     Y = df.drop(["message", "genre"], axis=1)
-    category_names = X.columns
-
-    return X, Y, category_names
+    
+    return X, Y
 
 
 def tokenize(text):
@@ -87,7 +86,7 @@ def build_model():
                     'message'),
             (OneHotEncoder(), ['genre'])
             ),
-    VarianceThreshold(),  # removes zero-variance features
+    VarianceThreshold(),
     SelectKBest(multi_f_classif, k=400),
     MaxAbsScaler(),
     MultiOutputClassifier(
@@ -95,7 +94,7 @@ def build_model():
             solver="saga",
             C=0.1,
             penalty="l1",
-            max_iter=1000,
+            # max_iter=1000,
             class_weight="balanced"
             )
         )
@@ -104,12 +103,15 @@ def build_model():
     return pipeline
 
 
-def evaluate_model(model, X_test, Y_test, category_names):
-    Y_pred_proba = model.predict_proba(X_test)
+def evaluate_model(model, X_test, Y_test):
+    """Return Precision-Recall AUC and ROC AUC
+    """
 
+    Y_pred_proba = model.predict_proba(X_test)
+    
     pr_scores = []
     roc_scores = []
-    for i, column in enumerate(category_names):
+    for i, column in enumerate(Y_test.columns):
         pr_scores.append(average_precision_score(Y_test[column].values, Y_pred_proba[i][:,1]))
         roc_scores.append(roc_auc_score(Y_test[column].values, Y_pred_proba[i][:,1]))
 
@@ -136,8 +138,8 @@ def main():
 
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
-        X, Y, category_names = load_data(database_filepath)
-        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2)
+        X, Y = load_data(database_filepath)
+        X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=33634)
         
         print('Building model...')
         model = build_model()
@@ -146,7 +148,7 @@ def main():
         model.fit(X_train, Y_train)
         
         print('Evaluating model...')
-        evaluate_model(model, X_test, Y_test, category_names)
+        evaluate_model(model, X_test, Y_test)
 
         print('Saving model...\n    MODEL: {}'.format(model_filepath))
         save_model(model, model_filepath)
