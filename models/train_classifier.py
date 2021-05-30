@@ -10,6 +10,7 @@ from sklearn.preprocessing import OneHotEncoder
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.feature_selection import VarianceThreshold
 from sklearn.feature_selection import SelectKBest
+from sklearn.feature_selection import f_classif
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
@@ -86,7 +87,7 @@ def build_model():
                     'message'),
             (OneHotEncoder(), ['genre'])
             ),
-    VarianceThreshold(),
+    VarianceThreshold(),  # removes zero-variance features
     SelectKBest(multi_f_classif, k=400),
     MaxAbsScaler(),
     MultiOutputClassifier(
