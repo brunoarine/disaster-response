@@ -5,7 +5,7 @@ import re
 import numpy as np
 from sklearn.pipeline import make_pipeline
 from sklearn.compose import make_column_transformer
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MaxAbsScaler
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.feature_selection import VarianceThreshold
@@ -87,12 +87,12 @@ def build_model():
             (OneHotEncoder(), ['genre'])
             ),
     VarianceThreshold(),
-    SelectKBest(multi_f_classif, k=250),
-    StandardScaler(with_mean=False),
+    SelectKBest(multi_f_classif, k=450),
+    MaxAbsScaler()
     MultiOutputClassifier(
         LogisticRegression(
             solver="saga",
-            C=0.01,
+            C=0.1,
             penalty="l1",
             max_iter=1000,
             class_weight="balanced"
