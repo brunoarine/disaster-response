@@ -88,7 +88,7 @@ def build_model():
             ),
     VarianceThreshold(),
     SelectKBest(multi_f_classif, k=400),
-    MaxAbsScaler()
+    MaxAbsScaler(),
     MultiOutputClassifier(
         LogisticRegression(
             solver="saga",
