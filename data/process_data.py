@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def load_data(messages_filepath, categories_filepath):
-    """Loads and transforms raw data.
+    """Load and transform raw data.
     """
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
@@ -83,8 +83,8 @@ def main():
               'datasets as the first and second argument respectively, as '\
               'well as the filepath of the database to save the cleaned data '\
               'to as the third argument. \n\nExample: python process_data.py '\
-              '../../data/raw/messages.csv ../../data/raw/categories.csv '\
-              '../../data/processed/messages.db')
+              'disaster_messages.csv disaster_categories.csv '\
+              'DisasterResponse.db')
 
 
 if __name__ == '__main__':
