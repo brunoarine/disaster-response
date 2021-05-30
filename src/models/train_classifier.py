@@ -87,7 +87,7 @@ def build_model():
             (OneHotEncoder(), ['genre'])
             ),
     VarianceThreshold(),
-    SelectKBest(multi_f_classif, k=450),
+    SelectKBest(multi_f_classif, k=400),
     MaxAbsScaler()
     MultiOutputClassifier(
         LogisticRegression(
