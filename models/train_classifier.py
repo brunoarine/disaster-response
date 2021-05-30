@@ -21,6 +21,14 @@ from nltk.tokenize import regexp_tokenize
 from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
 
+# download nltk data
+download('punkt')
+download('stopwords')
+
+# load nltk's stopwords into a global variable instead of
+# calling the function repeatedly
+STOPWORDS = stopwords.words("english")
+
 def load_data(database_filepath):
     """Loads the database in SQL format and returns machine-learning ready X,
     Y, and category_names
@@ -77,14 +85,13 @@ def build_model():
                 TfidfVectorizer(
                     tokenizer=tokenize,
                     max_df=0.5, 
-                    max_features=5000,
-                    use_idf=False),
+                    ngram_range=(1,2),
+                    use_idf=True),
                 VarianceThreshold(),
-                SelectKBest(multi_f_classif, k=500),
                 MaxAbsScaler(),
                 MultiOutputClassifier(
                     PassiveAggressiveClassifier(
-                        C=0.02,
+                        C=0.0075,
                         class_weight="balanced",
                         early_stopping=True,
                         random_state=33634
@@ -115,14 +122,7 @@ def save_model(model, model_filepath):
 
 def main():
     if len(sys.argv) == 3:
-        # download nltk data
-        download('punkt')
-        download('stopwords')
-
-        # load nltk's stopwords into a global variable instead of
-        # calling the function repeatedly
-        global STOPWORDS
-        STOPWORDS = stopwords.words("english")
+        
 
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
