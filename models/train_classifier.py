@@ -12,9 +12,8 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import average_precision_score
+from sklearn.linear_model import PassiveAggressiveClassifier
+from sklearn.metrics import f1_score
 from sqlalchemy import create_engine
 from sklearn.model_selection import train_test_split
 from nltk import download
@@ -33,7 +32,7 @@ def load_data(database_filepath):
     # drop `id` and `original` columns since they have no effect on prediction
     df = df.drop(["id", "original"], axis=1)
 
-    X = df[["message", "genre"]]
+    X = df["message"]
     Y = df.drop(["message", "genre"], axis=1)
     
     return X, Y
@@ -75,28 +74,21 @@ def build_model():
     """
   
     pipeline = make_pipeline(
-        # Vectorize the `message` column and create dummy variables for the `genre` column,
-        make_column_transformer(
-            (
                 TfidfVectorizer(
                     tokenizer=tokenize,
                     max_df=0.5, 
                     max_features=5000,
                     use_idf=False),
-                    'message'),
-            (OneHotEncoder(), ['genre'])
-            ),
-    VarianceThreshold(),
-    SelectKBest(multi_f_classif, k=400),
-    MaxAbsScaler(),
-    MultiOutputClassifier(
-        LogisticRegression(
-            solver="saga",
-            C=0.1,
-            penalty="l1",
-            # max_iter=1000,
-            class_weight="balanced"
-            )
+                VarianceThreshold(),
+                SelectKBest(multi_f_classif, k=500),
+                MaxAbsScaler(),
+                MultiOutputClassifier(
+                    PassiveAggressiveClassifier(
+                        C=0.02,
+                        class_weight="balanced",
+                        early_stopping=True,
+                        random_state=33634
+                )
         )
     )
     
@@ -107,17 +99,13 @@ def evaluate_model(model, X_test, Y_test):
     """Return Precision-Recall AUC and ROC AUC
     """
 
-    Y_pred_proba = model.predict_proba(X_test)
-    
-    pr_scores = []
-    roc_scores = []
+    Y_pred = model.predict(X_test)
+    scores = []
     for i, column in enumerate(Y_test.columns):
-        pr_scores.append(average_precision_score(Y_test[column].values, Y_pred_proba[i][:,1]))
-        roc_scores.append(roc_auc_score(Y_test[column].values, Y_pred_proba[i][:,1]))
-
-    print("Mean PR AUC:", np.mean(pr_scores))
-    print("Mean ROC AUC:", np.mean(roc_scores))
-    print(pd.DataFrame(np.array([Y_test.columns, pr_scores, roc_scores]).T, columns=["Category", "PR AUC", "ROC AUC"]))
+        scores.append(f1_score(Y_test[column].values, Y_pred[:,i]))
+    
+    print("Mean F1 score:", np.mean(scores))
+    print(pd.DataFrame(np.array([Y_test.columns, scores]).T, columns=["Category", "F1 score"]))
 
 
 def save_model(model, model_filepath):
