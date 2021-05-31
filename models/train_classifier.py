@@ -1,25 +1,23 @@
-import sys
-import pandas as pd
-import joblib
 import re
+import sys
+
+import joblib
 import numpy as np
-from sklearn.pipeline import make_pipeline
-from sklearn.compose import make_column_transformer
-from sklearn.preprocessing import MaxAbsScaler
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.multioutput import MultiOutputClassifier
-from sklearn.feature_selection import VarianceThreshold
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import f_classif
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import PassiveAggressiveClassifier
-from sklearn.metrics import f1_score
-from sqlalchemy import create_engine
-from sklearn.model_selection import train_test_split
+import pandas as pd
 from nltk import download
-from nltk.tokenize import regexp_tokenize
-from nltk.stem import PorterStemmer
 from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.tokenize import regexp_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_selection import VarianceThreshold
+from sklearn.linear_model import PassiveAggressiveClassifier
+from sklearn.metrics import classification_report
+from sklearn.metrics import f1_score
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.multioutput import MultiOutputClassifier
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import MaxAbsScaler
+from sqlalchemy import create_engine
 
 # download nltk data
 download('punkt')
@@ -28,6 +26,7 @@ download('stopwords')
 # load nltk's stopwords into a global variable instead of
 # calling the function repeatedly
 STOPWORDS = stopwords.words("english")
+
 
 def load_data(database_filepath):
     """Loads the database in SQL format and returns machine-learning ready X,
@@ -42,7 +41,7 @@ def load_data(database_filepath):
 
     X = df["message"]
     Y = df.drop(["message", "genre"], axis=1)
-    
+
     return X, Y
 
 
@@ -50,12 +49,13 @@ def tokenize(text):
     """Tokenizes texts by first stripping punctuations and normalizing cases.
     Words are also preprocessed with Porter Stemmer before tokenization takes place.
     """
+
     # normalize case and remove punctuation
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
-    
+
     # tokenize text
     tokens = regexp_tokenize(text, pattern="\w+")
-    
+
     tokens = [word for word in tokens if word not in STOPWORDS]
     stemmer = PorterStemmer()
 
@@ -66,40 +66,40 @@ def tokenize(text):
 
     return clean_tokens
 
-def multi_f_classif(X,y):
-    """Extends the f_classif function to multioutput problems.
-    """
-    scores = []
-    y = np.array(y)
-    m = y.shape[1]
-    for j in range(m):
-        scores.append(f_classif(X, y[:,j])[0])
-    return np.mean(scores, axis=0)
-
 
 def build_model():
     """Builds the machine learning model
     """
-  
+
     pipeline = make_pipeline(
-                TfidfVectorizer(
-                    tokenizer=tokenize,
-                    max_df=0.5, 
-                    ngram_range=(1,2),
-                    use_idf=True),
-                VarianceThreshold(),
-                MaxAbsScaler(),
-                MultiOutputClassifier(
-                    PassiveAggressiveClassifier(
-                        C=0.0075,
-                        class_weight="balanced",
-                        early_stopping=True,
-                        random_state=33634
-                )
+        TfidfVectorizer(
+            tokenizer=tokenize,
+            max_df=0.5,
+            ngram_range=(1, 2),
+            use_idf=True),
+        VarianceThreshold(),
+        MaxAbsScaler(),
+        MultiOutputClassifier(
+            PassiveAggressiveClassifier(
+                class_weight="balanced",
+                early_stopping=True,
+                random_state=33634
+            )
         )
     )
-    
-    return pipeline
+
+    parameters = {
+        'tfidfvectorizer__max_df': [0.4, 0.5, 0.6],
+        'tfidfvectorizer__ngram_range': [(1, 1), (1, 2)],
+        'tfidfvectorizer__norm': ['l1', 'l2'],
+        'tfidfvectorizer__use_idf': [True, False],
+        'tfidfvectorizer__sublinear_tf': [True, False],
+        'multioutputclassifier__estimator__C': [0.01, 0.025, 0.05, 0.075, 0.1]
+    }
+
+    grid = GridSearchCV(estimator=pipeline, param_grid=parameters, cv=3)
+
+    return grid
 
 
 def evaluate_model(model, X_test, Y_test):
@@ -109,32 +109,31 @@ def evaluate_model(model, X_test, Y_test):
     Y_pred = model.predict(X_test)
     scores = []
     for i, column in enumerate(Y_test.columns):
-        scores.append(f1_score(Y_test[column].values, Y_pred[:,i]))
-    
+        scores.append(f1_score(Y_test[column].values, Y_pred[:, i]))
+        print(classification_report(Y_test[column].values, Y_pred[:, i]))
+
     print("Mean F1 score:", np.mean(scores))
-    print(pd.DataFrame(np.array([Y_test.columns, scores]).T, columns=["Category", "F1 score"]))
 
 
 def save_model(model, model_filepath):
-    joblib.dump(model, model_filepath, compress=3) 
+    joblib.dump(model, model_filepath, compress=3)
     print('Trained model saved!')
 
 
 def main():
     if len(sys.argv) == 3:
-        
 
         database_filepath, model_filepath = sys.argv[1:]
         print('Loading data...\n    DATABASE: {}'.format(database_filepath))
         X, Y = load_data(database_filepath)
         X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.2, random_state=33634)
-        
+
         print('Building model...')
         model = build_model()
-        
+
         print('Training model...')
         model.fit(X_train, Y_train)
-        
+
         print('Evaluating model...')
         evaluate_model(model, X_test, Y_test)
 
@@ -142,9 +141,9 @@ def main():
         save_model(model, model_filepath)
 
     else:
-        print('Please provide the filepath of the disaster messages database '\
-              'as the first argument and the filepath of the pickle file to '\
-              'save the model to as the second argument. \n\nExample: python '\
+        print('Please provide the filepath of the disaster messages database '
+              'as the first argument and the filepath of the pickle file to '
+              'save the model to as the second argument. \n\nExample: python '
               'train_classifier.py ../data/DisasterResponse.db classifier.joblib')
 
 
