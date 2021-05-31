@@ -18,6 +18,11 @@ from sklearn.multioutput import MultiOutputClassifier
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MaxAbsScaler
 from sqlalchemy import create_engine
+import multiprocessing
+
+
+# estimate number of cores to optimize model training (i.e. use total available cpus - 1)
+CPU_COUNT = multiprocessing.cpu_count()
 
 # download nltk data
 download('punkt')
@@ -97,7 +102,7 @@ def build_model():
         'multioutputclassifier__estimator__C': [0.01, 0.025, 0.05, 0.075, 0.1]
     }
 
-    grid = GridSearchCV(estimator=pipeline, param_grid=parameters, cv=3)
+    grid = GridSearchCV(estimator=pipeline, param_grid=parameters, cv=3, verbose=1, n_jobs=CPU_COUNT-1)
 
     return grid
 
