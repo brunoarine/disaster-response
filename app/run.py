@@ -10,9 +10,7 @@ from sqlalchemy import create_engine
 
 import sys
 sys.path.append('../')
-from models.train_classifier import multi_f_classif
 from models.train_classifier import tokenize
-
 from models.train_classifier import STOPWORDS
 
 
