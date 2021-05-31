@@ -115,6 +115,8 @@ def evaluate_model(model, X_test, Y_test):
     scores = []
     for i, column in enumerate(Y_test.columns):
         scores.append(f1_score(Y_test[column].values, Y_pred[:, i]))
+        print(str(column))
+        print("-"*40)
         print(classification_report(Y_test[column].values, Y_pred[:, i]))
 
     print("Mean F1 score:", np.mean(scores))
