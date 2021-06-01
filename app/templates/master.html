@@ -11,6 +11,7 @@
           integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
           integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 
@@ -23,15 +24,14 @@
 
    }
 
-
         .title {
+            font-size: 18px;
         font-family: "Oswald", sans-serif;
         }
 
         .text-white {
         color: #FFF;
         }
-
 
     </style>
 </head>
@@ -45,8 +45,8 @@
         </div>
         <div id="navbar" class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
+                <li><a href="https://github.com/brunoarine">Contact</a></li>
                 <li><a href="https://www.udacity.com/">Made with Udacity</a></li>
-                <li><a href="https://github.com/">Contact</a></li>
             </ul>
         </div>
     </div>
@@ -54,7 +54,7 @@
 
 
 <div class="jumbotron"
-     style="background-image: url('./images/pexels-denniz-futalan-942560.jpg'); background-size: cover; background-position: center;">
+     style="background-image: url('/static/pexels-denniz-futalan-942560.jpg'); background-size: cover; background-position: center;">
     <div class="container text-white">
         <h1 class="text-center title">⛑️ Disaster Response Project</h1>
         <br/>
@@ -78,28 +78,29 @@
     </div>
 </div>
 
-<div class="container">
+<div class="container fs-4">
     {% block content %}
-    <p>Disaster response is one of the most important problems that we're trying to solve in Data Science and Machine
-        Learning right now.</p>
 
-    <p>In the wake of a disaster there are millions of communications either direct or via social media, right at the
-        time when disaster response organizations have the least capacity to filter and pull out the messages which are
-        the most important. Furthermore, only one in every thousand messages is actually relevant to the disaster
-        response professionals, according to Robert Munro, former CTO of Figure Eight (now Appen).</p>
 
-    <h3>Machine learning to the rescue</h3>
+    <p>In the wake of a disaster, there are millions of communications, either direct or via social media. But they
+        happen right when disaster response organizations have the least capacity to filter and pull out the most
+        critical messages. Furthermore, only one in every thousand messages is relevant to the disaster response
+        professionals, according to Robert Munro, former CTO of Figure Eight (now Appen).</p>
 
+    <br>
     <p>Disasters are typically responded to by different organizations that take care of different parts of the problem.
         So one organization will care about water, another will care about blocked roads, another will care about
         medical supplies. But sorting through help requests by keywords only is ineffective. For example, when you look
-        at a keyword like "water", that's actually a very small percent of the time that it will map to someone who
-        needs fresh drinking wate. Moreover, that will miss miss people who say they're thirsty, but don't use the word
-        "water."</p>
+        at a keyword like "water," that's a tiny percent of the time that it will map to someone who needs fresh
+        drinking water. Moreover, that will miss people who say they're thirsty but don't use the word "water."</p>
 
-    <p>Thanks to Figure Eight's effort of combining messages from several real-life distasters and consistently labeling
-        them, we can train a supervised machine learning model and ensure that each organization gets relevant help
-        requests.</p>
+    <br>
+
+    <p> To tackle this problem, this project uses thousands of pre-labeled tweets and text messages
+        from real-life disasters to train a supervised machine learning model. The model then predicts what the message is about, so that
+        each aid organization gets its correspondent help request. More details and source code is available <a
+                href="https://github.com/brunoarine/disaster-response">here</a>.
+    </p>
 
 
     <div class="page-header">
@@ -118,6 +119,12 @@
     for(let i in graphs) {
         Plotly.plot(ids[i], graphs[i].data, graphs[i].layout);
     }
+
+
+
+
+
+
 
 </script>
 

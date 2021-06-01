@@ -3,7 +3,7 @@ import plotly
 import pandas as pd
 
 from flask import Flask
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, url_for
 from plotly.graph_objs import Bar
 import joblib
 from sqlalchemy import create_engine
@@ -31,8 +31,10 @@ def index():
     
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
-    genre_counts = df.groupby('genre').count()['message']
-    genre_names = list(genre_counts.index)
+    #genre_counts = df.groupby('genre').count()['message']
+    #genre_names = list(genre_counts.index)
+    genre_counts = df.drop(["message", "original", "genre", "id"], axis=1).sum().sort_values(ascending=True)
+    genre_names = genre_counts.index.str.replace("_", " ")
     
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -40,21 +42,24 @@ def index():
         {
             'data': [
                 Bar(
-                    x=genre_names,
-                    y=genre_counts
+                    y=genre_names,
+                    x=genre_counts,
+                    marker=dict(color="gray"),
+                    orientation="h"
                 )
             ],
 
             'layout': {
-                'title': 'Distribution of Message Genres',
-                'yaxis': {
+                'title': 'Distribution of Message Categories',
+                'height': 1000,
+                'autosize': 'true',
+                'xaxis': {
                     'title': "Count"
                 },
-                'xaxis': {
-                    'title': "Genre"
-                }
+
             }
         }
+
     ]
     
     # encode plotly graphs in JSON
