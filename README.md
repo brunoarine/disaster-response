@@ -6,7 +6,7 @@ You can view the app on https://disaster-response-brunoarine.herokuapp.com
 
 ## How it works
 
-A Python program extracts pre-labeled tweets, messages, and news snippets of real-life disasters from a dataset provided by Appen in CSV format. The dataset is then cleaned and converted to SQL format, which is used to train 36 incremental learning algorithms --- one for each of the 36 message categories. The models are put together and their hyperparameters optimized, and an app built on Flask and hosted on Heroku serves the content on the web. The algorithm takes the user's message as input, and returns a list of the most probable categories of help request to which the user's message belongs.
+A Python program extracts the text from translated, pre-labeled tweets, messages, and news snippets of real-life disasters from a dataset provided by [Appen](https://www.appen.com) in CSV format. The dataset is then cleaned and converted to SQL format, which is used to train 36 incremental learning algorithms—one for each of the 36 message categories. The models are put together and their hyperparameters optimized, and an app built on Flask and hosted on Heroku serves the content on the web. The algorithm takes the user's message as input, and returns a list of the most probable categories of help request to which the user's message belongs.
 
 ## How to run this project
 
@@ -59,5 +59,5 @@ pip install -r requirements.txt
 
 ## Acknowledgements
 
-- Udacity for providing the tools and incentive to carry out this project.
-- Appen for providing a huge amount of labeled data, which was key to the success of this project.
+- [Udacity](https://www.udacity.com) for providing the tools and incentive to carry out this project.
+- [Appen](https://www.appen.com) for providing a huge amount of labeled data, which was key to the success of this project.
