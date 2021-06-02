@@ -1,6 +1,8 @@
-# disaster-response
+# Disaster Response Project
 
-This web app showcases a machine learning model that is capable of classifying disaster-related help requests according to the message content. The aim is to ensure that victims of large-scale disasters have their messages mapped to the right disaster response groups, automatically or with minimal human intervention.
+This web app showcases a machine learning model that is capable of classifying disaster-related help requests according to the message's content. The aim is to ensure that victims of large-scale disasters have their messages mapped to the right disaster response groups, either automatically or with minimal human intervention.
+
+You can view the app on https://disaster-response-brunoarine.herokuapp.com
 
 ## How it works
 
@@ -8,7 +10,37 @@ A Python program extracts pre-labeled tweets, messages, and news snippets of rea
 
 ## How to run this project
 
-## Requirements
+First, type the following in your shell prompt:
+
+```sh
+git clone https://github.com/brunoarine/disaster-response.git
+```
+### Process the raw data into an SQL database
+
+Open the `data` folder and type the following in your shell prompt:
+
+```sh
+python process_data.py disaster_messages.csv disaster_categories.csv DisasterResponse.db
+```
+### Train the classifier
+
+Open the `models` folder and type the following in your shell prompt:
+
+```sh
+python train_classifier.py ../data/DisasterResponse.db classifier.pkl
+```
+### Run the web app
+
+Open the `app` folder and type:
+
+```sh
+python run.py
+```
+
+You'll be able to access the server on your local machine at http://0.0.0.0:3001
+
+
+## Prerequisites
 
 - numpy 1.20.2
 - plotly 4.14.3
@@ -18,6 +50,12 @@ A Python program extracts pre-labeled tweets, messages, and news snippets of rea
 - SQLAlchemy 1.3.23
 - pandas 1.2.3
 - scikit_learn 0.24.2
+
+Install the packages with:
+
+```sh
+pip install -r requirements.txt
+```
 
 ## Acknowledgements
 
