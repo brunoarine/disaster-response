@@ -4,9 +4,11 @@ This web app showcases a machine learning model that is capable of classifying d
 
 You can view the app on https://disaster-response-brunoarine.herokuapp.com
 
+![./images/screenshot.png](./images/screenshot.png)
+
 ## How it works
 
-A Python program extracts the text from translated, pre-labeled tweets, messages, and news snippets of real-life disasters from a dataset provided by [Appen](https://www.appen.com) in CSV format. The dataset is then cleaned and converted to SQL format, which is used to train 36 incremental learning algorithms—one for each of the 36 message categories. The models are put together and their hyperparameters optimized, and an app built on Flask and hosted on Heroku serves the content on the web. The algorithm takes the user's message as input, and returns a list of the most probable categories of help request to which the user's message belongs.
+A Python program extracts the text from translated, pre-labeled tweets, messages, and news snippets of real-life disasters from a dataset provided by [Appen](https://www.appen.com) in CSV format. The dataset is then cleaned and converted to SQLite format, which is used to train 36 incremental learning algorithms—one for each of the 36 message categories. The models are put together and their hyperparameters optimized, and an app built on Flask and hosted on Heroku serves the content on the web. The algorithm takes the user's message as input, and returns a list of the most probable categories of help request to which the user's message belongs.
 
 ## How to run this project
 
