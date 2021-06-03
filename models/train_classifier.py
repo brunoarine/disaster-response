@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from nltk import download
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
+from nltk.stem import PorterStemmer, WordNetLemmatizer
 from nltk.tokenize import regexp_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_selection import VarianceThreshold
@@ -19,6 +19,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import MaxAbsScaler
 from sqlalchemy import create_engine
 import multiprocessing
+
 
 
 # estimate number of cores to optimize model training (i.e. use total available cpus - 1)
@@ -62,14 +63,15 @@ def tokenize(text):
     tokens = regexp_tokenize(text, pattern="\w+")
 
     tokens = [word for word in tokens if word not in STOPWORDS]
-    stemmer = PorterStemmer()
+    lemmatizer = WordNetLemmatizer()
 
     clean_tokens = []
     for tok in tokens:
-        clean_tok = stemmer.stem(tok)
+        clean_tok = lemmatizer.lemmatize(tok)
         clean_tokens.append(clean_tok)
 
     return clean_tokens
+
 
 
 def build_model():
@@ -99,7 +101,7 @@ def build_model():
         'tfidfvectorizer__norm': ['l1', 'l2'],
         'tfidfvectorizer__use_idf': [True, False],
         'tfidfvectorizer__sublinear_tf': [True, False],
-        'multioutputclassifier__estimator__C': [0.01, 0.025, 0.05, 0.075, 0.1]
+        'multioutputclassifier__estimator__C': [0.01, 0.025, 0.05, 0.075, 0.1],
     }
 
     grid = GridSearchCV(estimator=pipeline, param_grid=parameters, cv=3, verbose=1, n_jobs=CPU_COUNT-1)
